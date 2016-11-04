@@ -1,9 +1,5 @@
 package com.company;
 
-/**
- * Created by austinchung on 11/3/16.
- */
-
 // 2016-11-03 15:45:05,238 74395    1478205905	localhost:6703	  8:exclaim1   	__emit-count           	{default=960}
 public class metric {
 
