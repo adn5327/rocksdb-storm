@@ -29,11 +29,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        //Metric thing = new Metric("2016-11-03 15:45:05,238 74395    1478205905\tlocalhost:6703\t  8:exclaim1   \t__emit-count           \t{default=960}");
-        //System.out.println(thing.serialize());
-        //connector.insert(thing);
         List<String> x = connector.scan("74395");
-
         for(String each : x)
         {
             System.out.println(each);

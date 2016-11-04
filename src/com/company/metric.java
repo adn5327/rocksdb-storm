@@ -20,7 +20,6 @@ public class Metric {
 
     private String value = null;
 
-    // topo1|hb1|0|c1|s1|h1|p1,50
     public Metric(String stamp) {
         String[] elements = stamp.split("\\s+");
         this.datestamp = elements[0];
