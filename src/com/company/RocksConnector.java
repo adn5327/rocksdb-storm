@@ -10,9 +10,7 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
-/**
- * Created by adn5327 on 11/3/16.
- */
+
 public class RocksConnector {
 
     private RocksDB db;
