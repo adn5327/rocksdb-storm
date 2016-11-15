@@ -29,11 +29,8 @@ public class Main {
             e.printStackTrace();
         }
 
-        List<String> x = connector.scan("74395");
-        for(String each : x)
-        {
-            System.out.println(each);
-        }
+
+        connector.aggregate("74395", "74398", connector);
 
     }
 }

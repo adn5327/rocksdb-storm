@@ -62,4 +62,30 @@ public class RocksConnector {
         return result;
     }
 
+    public List<String> scan(String start, String end)
+    {
+        List<String> result = new ArrayList<String>();
+        RocksIterator iterator = this.db.newIterator();
+        int startEpoch = Integer.parseInt(start);
+        int endEpoch = Integer.parseInt(end);
+        for (iterator.seek(start.getBytes()); iterator.isValid(); iterator.next()) {
+            String key = new String(iterator.key());
+            int currentEpoch = Integer.parseInt(key);
+            if (currentEpoch >= startEpoch && currentEpoch <= endEpoch) {
+                result.add(String.format("%s", new String(iterator.key())));
+            }
+        }
+        return result;
+    }
+
+
+    public void aggregate(String startEpoch, String endEpoch, RocksConnector connector)
+    {
+        List<String> x = connector.scan(startEpoch, endEpoch);
+        for(String each : x)
+        {
+            System.out.println(each);
+        }
+    }
+
 }
