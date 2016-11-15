@@ -10,9 +10,7 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
-/**
- * Created by adn5327 on 11/3/16.
- */
+
 public class RocksConnector {
 
     private RocksDB db;
@@ -62,26 +60,40 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(String start, String end)
+    public List<String> scan(String prefix, String start, String end) throws RocksDBException
     {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
         int startEpoch = Integer.parseInt(start);
         int endEpoch = Integer.parseInt(end);
-        for (iterator.seek(start.getBytes()); iterator.isValid(); iterator.next()) {
+
+        for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            int currentEpoch = Integer.parseInt(key);
-            if (currentEpoch >= startEpoch && currentEpoch <= endEpoch) {
-                result.add(String.format("%s", new String(iterator.key())));
+            //System.out.println(key);
+            String[] elements = key.split("\\|");
+
+            try {
+                int currentEpoch = Integer.parseInt(elements[2]);
+                //System.out.println(currentEpoch);
+                //System.out.println(currentEpoch);
+                if (currentEpoch >= startEpoch && currentEpoch <= endEpoch) {
+                    String something = new String(this.db.get(iterator.key()));
+                    System.out.println(something);
+                    result.add(String.format("%s", new String(this.db.get(iterator.key()))));
+                }
+            } catch(NumberFormatException e) {
+
+                //System.out.println(e);
             }
+
         }
         return result;
     }
 
 
-    public void aggregate(String startEpoch, String endEpoch, RocksConnector connector)
+    public void aggregate(String prefix, String startEpoch, String endEpoch) throws RocksDBException
     {
-        List<String> x = connector.scan(startEpoch, endEpoch);
+        List<String> x = this.scan(prefix, startEpoch, endEpoch);
         for(String each : x)
         {
             System.out.println(each);
