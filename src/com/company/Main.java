@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 
 import java.io.IOException;
 import java.util.List;
+import org.rocksdb.RocksDBException;
 
 public class Main {
 
