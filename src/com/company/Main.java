@@ -19,9 +19,15 @@ public class Main {
         // File IO
         try (BufferedReader br = new BufferedReader(new FileReader("./logs/metrics_sample.txt"))) {
             String line;
+            line = br.readLine();
             while ((line = br.readLine()) != null) {
                 //System.out.println(line); // put into rocks here
-                connector.insert(new Metric(line));
+                String[] elements = line.split("\\s+");
+                //    public Metric(String metric, int TS, int compId, String topoId, String value)
+                //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
+                Integer.parseInt(elements[6]);
+                Integer.parseInt(elements[5]);
+                connector.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
@@ -29,7 +35,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        List<String> x = connector.scan("74395");
+        List<String> x = connector.scan("my-test-topology|7");
         for(String each : x)
         {
             System.out.println(each);
