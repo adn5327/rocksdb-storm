@@ -32,8 +32,7 @@ import org.rocksdb.RocksIterator;
 public class RocksConnector {
 
     private RocksDB db;
-    public RocksConnector(String dbfilename)
-    {
+    public RocksConnector(String dbfilename) throws MetricException {
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
@@ -44,19 +43,18 @@ public class RocksConnector {
             this.db = RocksDB.open(options, dbfilename);
             // do something
         } catch (RocksDBException e) {
-            System.out.println(e);
+            throw new MetricException();
         }
     }
 
-    public void insert(Metric m)
-    {
+    public void insert(Metric m) throws MetricException {
         try
         {
             this.db.put(m.serialize().getBytes(), m.getValue().getBytes());
         }
         catch(RocksDBException e)
         {
-            System.out.println("oh no!");
+            throw new MetricException();
         }
     }
 
@@ -89,7 +87,7 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(HashMap settings)
+    public List<String> scan(HashMap settings) throws MetricException
     {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
@@ -100,6 +98,7 @@ public class RocksConnector {
             //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
             //connector.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
             System.out.println(key);
+
 
             if ((settings.containsKey("metric") && elements[0] != settings.get("metric")) ||
                     !(settings.containsKey("compId") && elements[2] != settings.get("compId")) ||
