@@ -1,4 +1,5 @@
-metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
+metric	topoId	host	port	compname	compId	TS	value	dimensions (key=value)
+__emit-count	my-test-topology0	localhost	6703	exclaim1	13	1478205905	960	stream=default
 __emit-count	my-test-topology	localhost	6703	exclaim1	8	1478205905	960	stream=default
 __process-latency	my-test-topology	localhost	6703	exclaim1	8	1478205905	1.0	stream=default	from_comp=word
 __receive:arrival_rate_secs	my-test-topology	localhost	6703	exclaim1	8	1478205905	14.709063378758382	

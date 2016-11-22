@@ -21,7 +21,6 @@ package com.company;
 import java.lang.String;
 import java.lang.StringBuilder;
 
-// 2016-11-03 15:45:05,238 74395    1478205905	localhost:6703	  8:exclaim1   	__emit-count           	{default=960}
 public class Metric {
 
     private String metricName;
@@ -51,11 +50,14 @@ public class Metric {
     public String serialize()
     {
         StringBuilder x = new StringBuilder();
-        x.append(this.topoId);
+        x.append(this.metricName);
+        x.append('|');
+        x.append(this.timestamp);
         x.append('|');
         x.append(this.compId);
         x.append('|');
-        x.append(this.timestamp);
+        x.append(this.topoId);
+
         return String.valueOf(x);
     }
 }

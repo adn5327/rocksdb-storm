@@ -21,6 +21,7 @@ import java.lang.String;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.rocksdb.RocksDB;
 import org.rocksdb.Options;
@@ -64,6 +65,17 @@ public class RocksConnector {
 
     }
 
+    public List<String> scan()
+    {
+        List<String> result = new ArrayList<String>();
+        RocksIterator iterator = this.db.newIterator();
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+            String key = new String(iterator.key());
+            result.add(String.format("%s", new String(iterator.key())));
+        }
+        return result;
+    }
+
     public List<String> scan(String prefix)
     {
         List<String> result = new ArrayList<String>();
@@ -77,44 +89,29 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(String prefix, String start, String end) throws RocksDBException
+    public List<String> scan(HashMap settings)
     {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
-        int startEpoch = Integer.parseInt(start);
-        int endEpoch = Integer.parseInt(end);
-
-        for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            //System.out.println(key);
             String[] elements = key.split("\\|");
 
-            try {
-                int currentEpoch = Integer.parseInt(elements[2]);
-                //System.out.println(currentEpoch);
-                //System.out.println(currentEpoch);
-                if (currentEpoch >= startEpoch && currentEpoch <= endEpoch) {
-                    String something = new String(this.db.get(iterator.key()));
-                    System.out.println(something);
-                    result.add(String.format("%s", new String(this.db.get(iterator.key()))));
-                }
-            } catch(NumberFormatException e) {
+            //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
+            //connector.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
+            System.out.println(key);
 
-                //System.out.println(e);
+            if ((settings.containsKey("metric") && elements[0] != settings.get("metric")) ||
+                    !(settings.containsKey("compId") && elements[2] != settings.get("compId")) ||
+                    !(settings.containsKey("topoId") && elements[3] == settings.get("topoId"))) {
+
+                        continue;
+            } else {
+                result.add(String.format("%s", new String(iterator.value())));
             }
-
+            //System.out.println(settings.containsKey("metric"));
         }
         return result;
-    }
-
-
-    public void aggregate(String prefix, String startEpoch, String endEpoch) throws RocksDBException
-    {
-        List<String> x = this.scan(prefix, startEpoch, endEpoch);
-        for(String each : x)
-        {
-            System.out.println(each);
-        }
     }
 
 }

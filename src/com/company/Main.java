@@ -37,6 +37,7 @@ public class Main {
             line = br.readLine();
             while ((line = br.readLine()) != null) {
                 //System.out.println(line); // put into rocks here
+                //System.out.println(line);
                 String[] elements = line.split("\\s+");
                 //    public Metric(String metric, int TS, int compId, String topoId, String value)
                 //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
@@ -48,12 +49,19 @@ public class Main {
             e.printStackTrace();
         }
 
+        Aggregation sum = new Aggregation(connector);
+        sum.filterTopo("my-test-topology0");
+        System.out.println(sum.sum());
 
+
+
+
+/*
         List<String> x = connector.scan("my-test-topology|7");
         for (String each : x) {
-            //System.out.println(each);
+            System.out.println(each);
         }
-
-        connector.scan("my-test-topology","1478209814","1478209816");
+*/
+        //connector.scan("my-test-topology","1478209814","1478209816");
     }
 }
