@@ -28,7 +28,7 @@ import org.rocksdb.RocksDBException;
 
 public class Main {
 
-    public static void main(String[] args) throws RocksDBException{
+    public static void main(String[] args) throws MetricException{
         RocksConnector connector = new RocksConnector("db.test");
 
         // File IO
@@ -63,5 +63,6 @@ public class Main {
         }
 */
         //connector.scan("my-test-topology","1478209814","1478209816");
+
     }
 }

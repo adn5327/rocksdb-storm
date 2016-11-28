@@ -60,7 +60,7 @@ public class Aggregation {
 
     // Aggregations
 
-    public Double sum() throws RocksDBException {
+    public Double sum() throws MetricException {
         Double sum = 0.0;
         List<String> x = this.connector.scan(settings);
         for(String each : x) {
@@ -70,7 +70,7 @@ public class Aggregation {
         return sum;
     }
 
-    public Double min() throws RocksDBException {
+    public Double min() throws MetricException {
         Double min = Double.MAX_VALUE;
         List<String> x = this.connector.scan(settings);
         for(String each : x) {
@@ -82,7 +82,7 @@ public class Aggregation {
         return min;
     }
 
-    public Double max() throws RocksDBException {
+    public Double max() throws MetricException {
         Double max = Double.MIN_VALUE;
         List<String> x = this.connector.scan(settings);
         for(String each : x) {
@@ -94,7 +94,7 @@ public class Aggregation {
         return max;
     }
 
-    public Double mean() throws RocksDBException {
+    public Double mean() throws MetricException {
         Double sum = 0.0;
         Integer count = 0;
         List<String> x = this.connector.scan(settings);
