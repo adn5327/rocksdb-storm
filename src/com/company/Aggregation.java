@@ -64,6 +64,7 @@ public class Aggregation {
         Double sum = 0.0;
         List<String> x = this.connector.scan(settings);
         for(String each : x) {
+            System.out.println(each);
             sum += Double.parseDouble(each);
         }
         return sum;

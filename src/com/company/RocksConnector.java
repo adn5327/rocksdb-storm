@@ -97,19 +97,11 @@ public class RocksConnector {
             String key = new String(iterator.key());
             String[] elements = key.split("\\|");
 
-            //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
-            //connector.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
-            System.out.println(key);
-
-            if ((settings.containsKey("metric") && elements[0] != settings.get("metric")) ||
-                    !(settings.containsKey("compId") && elements[2] != settings.get("compId")) ||
-                    !(settings.containsKey("topoId") && elements[3] == settings.get("topoId"))) {
-
-                        continue;
-            } else {
+            if (!(settings.containsKey("metric") && !elements[0].equals(settings.get("metric")) ||
+                    settings.containsKey("compId") && !elements[0].equals(settings.get("compId")) ||
+                    settings.containsKey("topoId") && !elements[3].equals(settings.get("topoId")))){
                 result.add(String.format("%s", new String(iterator.value())));
             }
-            //System.out.println(settings.containsKey("metric"));
         }
         return result;
     }
