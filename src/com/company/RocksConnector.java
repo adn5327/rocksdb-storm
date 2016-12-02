@@ -29,11 +29,11 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
 
-public class RocksConnector {
+public class RocksConnector implements MetricStore {
 
     private RocksDB db;
-    public RocksConnector(String dbfilename)
-    {
+
+    public void create(String filename) {
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
@@ -41,32 +41,27 @@ public class RocksConnector {
         this.db = null;
         try {
             // a factory method that returns a RocksDB instance
-            this.db = RocksDB.open(options, dbfilename);
+            this.db = RocksDB.open(options, filename);
             // do something
         } catch (RocksDBException e) {
             System.out.println(e);
         }
     }
 
-    public void insert(Metric m)
-    {
-        try
-        {
+    public void insert(Metric m) {
+        try {
             this.db.put(m.serialize().getBytes(), m.getValue().getBytes());
         }
-        catch(RocksDBException e)
-        {
+        catch(RocksDBException e) {
             System.out.println("oh no!");
         }
     }
 
-    public void remove()
-    {
+    public void remove() {
 
     }
 
-    public List<String> scan()
-    {
+    public List<String> scan() {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
@@ -76,8 +71,7 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(String prefix)
-    {
+    public List<String> scan(String prefix) {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
@@ -89,8 +83,7 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(HashMap settings)
-    {
+    public List<String> scan(HashMap settings) {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {

@@ -26,13 +26,13 @@ import java.util.HashMap;
 public class Aggregation {
 
     // Rocks component
-    private RocksConnector connector;
+    private MetricStore store;
 
     // Key components
     private HashMap settings = new HashMap();
 
-    public Aggregation(RocksConnector connector) {
-        this.connector = connector;
+    public Aggregation(MetricStore store) {
+        this.store = store;
     }
 
     // Filter for specific fields
@@ -62,7 +62,7 @@ public class Aggregation {
 
     public Double sum() throws MetricException {
         Double sum = 0.0;
-        List<String> x = this.connector.scan(settings);
+        List<String> x = this.store.scan(settings);
         for(String each : x) {
             System.out.println(each);
             sum += Double.parseDouble(each);
@@ -72,7 +72,7 @@ public class Aggregation {
 
     public Double min() throws MetricException {
         Double min = Double.MAX_VALUE;
-        List<String> x = this.connector.scan(settings);
+        List<String> x = this.store.scan(settings);
         for(String each : x) {
             Double curr = Double.parseDouble(each);
             if(curr < min) {
@@ -84,7 +84,7 @@ public class Aggregation {
 
     public Double max() throws MetricException {
         Double max = Double.MIN_VALUE;
-        List<String> x = this.connector.scan(settings);
+        List<String> x = this.store.scan(settings);
         for(String each : x) {
             Double curr = Double.parseDouble(each);
             if(curr > max) {
@@ -97,7 +97,7 @@ public class Aggregation {
     public Double mean() throws MetricException {
         Double sum = 0.0;
         Integer count = 0;
-        List<String> x = this.connector.scan(settings);
+        List<String> x = this.store.scan(settings);
         for(String each : x) {
             sum += Integer.parseInt(each);
             count++;

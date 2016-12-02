@@ -29,7 +29,8 @@ import org.rocksdb.RocksDBException;
 public class Main {
 
     public static void main(String[] args) throws MetricException{
-        RocksConnector connector = new RocksConnector("db.test");
+        MetricStore store = new RocksConnector();
+        store.create("db.test");
 
         // File IO
         try (BufferedReader br = new BufferedReader(new FileReader("./logs/metrics_sample.txt"))) {
@@ -41,7 +42,7 @@ public class Main {
                 String[] elements = line.split("\\s+");
                 //    public Metric(String metric, int TS, int compId, String topoId, String value)
                 //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
-                connector.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
+                store.insert(new Metric(elements[0], Integer.parseInt(elements[6]), Integer.parseInt(elements[5]), elements[1], elements[7]));
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);
@@ -49,7 +50,7 @@ public class Main {
             e.printStackTrace();
         }
 
-        Aggregation sum = new Aggregation(connector);
+        Aggregation sum = new Aggregation(store);
         sum.filterTopo("my-test-topology0");
         System.out.println(sum.sum());
 
@@ -62,7 +63,7 @@ public class Main {
             System.out.println(each);
         }
 */
-        //connector.scan("my-test-topology","1478209814","1478209816");
+        //store.scan("my-test-topology","1478209814","1478209816");
 
     }
 }
