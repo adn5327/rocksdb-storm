@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 public class Aggregation {
 
-    // Rocks component
+    // Store component
     private MetricStore store;
 
     // Key components
