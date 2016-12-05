@@ -97,11 +97,11 @@ public class RocksConnector {
             String key = new String(iterator.key());
             String[] elements = key.split("\\|");
 
-            if (!(settings.containsKey("timeStart") && !(Integer.parseInt(elements[0]) >= Integer.parseInt(settings.get("timeStart").toString())) ||
-                    settings.containsKey("timeEnd") && !(Integer.parseInt(elements[0]) <= Integer.parseInt(settings.get("timeEnd").toString())) ||
+            if (!(settings.containsKey("compId") && !elements[3].equals(settings.get("compId")) || // Iterate backwards through prefix key for efficiency
+                    settings.containsKey("timeStart") && !(Long.parseLong(elements[2]) >= Long.parseLong(settings.get("timeStart").toString())) ||
+                    settings.containsKey("timeEnd") && !(Long.parseLong(elements[2]) <= Long.parseLong(settings.get("timeEnd").toString())) ||
                     settings.containsKey("metric") && !elements[1].equals(settings.get("metric")) ||
-                    settings.containsKey("compId") && !elements[2].equals(settings.get("compId")) ||
-                    settings.containsKey("topoId") && !elements[3].equals(settings.get("topoId"))
+                    settings.containsKey("topoId") && !elements[0].equals(settings.get("topoId"))
                 )){
                 result.add(String.format("%s", new String(iterator.value())));
             }
