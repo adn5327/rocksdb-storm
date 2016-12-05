@@ -16,15 +16,13 @@
  * under the License.
  */
 
-package com.company;
+package org.apache.storm.metrics2;
 
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
-import java.util.List;
-import org.rocksdb.RocksDBException;
 
 public class Main {
 

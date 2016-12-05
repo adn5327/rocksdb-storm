@@ -16,9 +16,7 @@
  * under the License.
  */
 
-package com.company;
-
-import org.rocksdb.RocksDBException;
+package org.apache.storm.metrics2;
 
 import java.util.List;
 import java.util.HashMap;
