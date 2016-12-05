@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import org.rocksdb.RocksDBException;
 
@@ -30,7 +31,13 @@ public class Main {
 
     public static void main(String[] args) throws MetricException{
         MetricStore store = new RocksConnector();
-        store.create("db.test");
+
+        HashMap config = new HashMap();
+        config.put("store-type", "rocksdb");
+        config.put("store-location", "db.test");
+        config.put("create-if-missing", "true");
+
+        store.prepare(config);
 
         // File IO
         try (BufferedReader br = new BufferedReader(new FileReader("./logs/metrics_sample.txt"))) {

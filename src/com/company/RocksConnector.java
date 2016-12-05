@@ -22,32 +22,61 @@ import java.lang.String;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.io.File;
 
 import org.rocksdb.RocksDB;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 
+/**
+ * This class implements the Storm Metrics Store Interface using RocksDB as a store
+ * It contains preparing, insertion and scan methods to store and query metrics
+ *
+ * @author Austin Chung <achung13@illinois.edu>
+ * @author Abhishek Deep Nigam <adn5327@gmail.com>
+ * @author Naren Dasan <naren@narendasan.com>
+ */
 
 public class RocksConnector implements MetricStore {
 
     private RocksDB db;
 
-    public void create(String filename) {
+    /**
+     * Implements the prepare method of the Metric Store, create RocksDB instance
+     * using the configurations provided via the config map
+     * @param config Storm config map
+     */
+    @Override
+    public void prepare(HashMap config) {
+
+        try {
+            validateConfig(config);
+        } catch(MetricException e) {
+            System.out.println(e);
+        }
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
-        Options options = new Options().setCreateIfMissing(true);
+        boolean createIfMissing = Boolean.parseBoolean(config.get("create-if-missing").toString());
+        Options options = new Options().setCreateIfMissing(createIfMissing);
+
         this.db = null;
         try {
             // a factory method that returns a RocksDB instance
-            this.db = RocksDB.open(options, filename);
+            String path = config.get("store-location").toString();
+            this.db = RocksDB.open(options, path);
             // do something
         } catch (RocksDBException e) {
             System.out.println(e);
         }
     }
 
+    /**
+     * Implements the insert method of the Metric Store, stores metrics in the store
+     * @param m Metric to store
+     */
+    @Override
     public void insert(Metric m) {
         try {
             this.db.put(m.serialize().getBytes(), m.getValue().getBytes());
@@ -57,10 +86,11 @@ public class RocksConnector implements MetricStore {
         }
     }
 
-    public void remove() {
-
-    }
-
+    /**
+     * Implements scan method of the Metrics Store, scans all metrics in the store
+     * @return List<String> metrics in store
+     */
+    @Override
     public List<String> scan() {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
@@ -71,6 +101,12 @@ public class RocksConnector implements MetricStore {
         return result;
     }
 
+    /**
+     * Implements scan method of the Metrics Store, scans all metrics with prefix in the store
+     * @param prefix prefix to query in store
+     * @return List<String> metrics in store
+     */
+    @Override
     public List<String> scan(String prefix) {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
@@ -83,6 +119,12 @@ public class RocksConnector implements MetricStore {
         return result;
     }
 
+    /**
+     * Implements scan method of the Metrics Store, scans all metrics with settings in the store
+     * @param settings map of settings to search by
+     * @return List<String> metrics in store
+     */
+    @Override
     public List<String> scan(HashMap settings) {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
@@ -97,6 +139,40 @@ public class RocksConnector implements MetricStore {
             }
         }
         return result;
+    }
+
+    /**
+     * Implements configuration validation of Metrics Store, validates storm configuration for Metrics Store
+     * @param config Storm config to specify which store type, location of store and creation policy
+     * @throws MetricException if there is a missing required configuration or if the store does not exist but
+     * the config specifies not to create the store
+     */
+    @Override
+    public void validateConfig(HashMap config) throws MetricException {
+        if (!(config.containsKey("store-type") && config.get("store-type") == "rocksdb")) {
+            throw new MetricException("Not a vaild RocksDB configuration - Missing store type");
+        }
+
+        if (!(config.containsKey("store-location"))) {
+            throw new MetricException("Not a vaild RocksDB configuration - Missing store location");
+        }
+
+        if (!(config.containsKey("create-if-missing"))) {
+            throw new MetricException("Not a vaild RocksDB configuration - Does not specify creation policy");
+        }
+
+        String createIfMissing = config.get("create-if-missing").toString();
+        if (!Boolean.parseBoolean(createIfMissing)) {
+            String storePath = config.get("store-location").toString();
+            if (!(new File(storePath).exists())) {
+                throw new MetricException("Configuration specifies not to create a store but no store currently exists");
+            }
+        }
+        return;
+    }
+
+    private void remove() {
+
     }
 
 }
