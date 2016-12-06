@@ -22,11 +22,13 @@ import java.lang.String;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.rocksdb.RocksDB;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
+import org.apache.storm.metrics2.StringKeywords;
 
 
 public class RocksConnector {
@@ -76,30 +78,46 @@ public class RocksConnector {
         return result;
     }
 
-    public List<String> scan(String prefix)
+    private List<String> scan(String prefix, HashMap<String, Object> settings)
     {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            if (key.startsWith(prefix)) {
-                result.add(String.format("%s", new String(iterator.key())));
+            boolean add = true;
+            for(Map.Entry<String, Object> entry: settings.entrySet()){
+                if(!key.contains(entry.getValue().toString())){
+                    add = false;
+                    break;
+                }
+            }
+            if(add == true)
+            {
+                result.add(String.format("%s", new String(iterator.value())));
             }
         }
         return result;
     }
 
-    public List<String> scan(HashMap settings)
+    public List<String> scan(HashMap<String, Object> settings)
     {
         List<String> result = new ArrayList<String>();
+        //IF CAN CREATE PREFIX -- USE THAT
+        //ELSE DO FULL TABLE SCAN
+        String prefix = Metric.createPrefix(settings);
+        if(prefix != null){
+            return scan(prefix, settings);
+        }
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
             String[] elements = key.split("\\|");
 
-            if (!(settings.containsKey("metric") && !elements[0].equals(settings.get("metric")) ||
-                    settings.containsKey("compId") && !elements[0].equals(settings.get("compId")) ||
-                    settings.containsKey("topoId") && !elements[3].equals(settings.get("topoId")))){
+            if (!(
+                    settings.containsKey(StringKeywords.metricName) && !elements[0].equals(settings.get(StringKeywords.metricName)) ||
+                    settings.containsKey(StringKeywords.component) && !elements[0].equals(settings.get(StringKeywords.component)) ||
+                    settings.containsKey(StringKeywords.topoId) && !elements[3].equals(settings.get(StringKeywords.topoId))
+                )){
                 result.add(String.format("%s", new String(iterator.value())));
             }
         }
