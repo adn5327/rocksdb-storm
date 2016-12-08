@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.storm.metrics2;
+package org.apache.storm.metrics2.store;
 
 
 public class StringKeywords
