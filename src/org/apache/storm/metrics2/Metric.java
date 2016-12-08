@@ -20,6 +20,8 @@ package org.apache.storm.metrics2;
 
 import java.lang.String;
 import java.lang.StringBuilder;
+import java.util.HashMap;
+import java.util.List;
 
 public class Metric {
 
@@ -27,11 +29,15 @@ public class Metric {
     private String topoId;
     private String host;
     private int port;
-    private String componentName;
     private String compId;
     private Long timestamp;
     private String value;
+    private String executor;
     private String dimensions;
+    private String stream;
+    private static String[] prefixOrder = {StringKeywords.topoId, StringKeywords.metricName, StringKeywords.time,
+                                    StringKeywords.component, StringKeywords.executor, StringKeywords.host,
+                                    StringKeywords.port, StringKeywords.port, StringKeywords.stream};
 
     public String getValue()
     {
@@ -47,13 +53,9 @@ public class Metric {
         this.value = value;
     }
 
-    public Metric(String key)
+    public Metric(String str)
     {
-        String[] elements = key.split("\\|");
-        this.metricName = elements[1];
-        this.timestamp = Long.parseLong(elements[2]);
-        this.compId = elements[3];
-        this.topoId = elements[0];
+        deserialize(str);
     }
 
     public String getCompId() { return this.compId; }
@@ -67,14 +69,57 @@ public class Metric {
     public String serialize()
     {
         StringBuilder x = new StringBuilder();
-        x.append(this.metricName);
-        x.append('|');
-        x.append(this.timestamp);
-        x.append('|');
-        x.append(this.compId);
-        x.append('|');
         x.append(this.topoId);
+        x.append("|");
+        x.append(this.metricName);
+        x.append("|");
+        x.append(this.timestamp);
+        x.append("|");
+        x.append(this.compId);
+        x.append("|");
+        x.append(this.executor);
+        x.append("|");
+        x.append(this.host);
+        x.append("|");
+        x.append(this.port);
+        x.append("|");
+        x.append(this.stream);
 
         return String.valueOf(x);
+    }
+
+    public static String createPrefix(HashMap<String, Object> settings){
+        StringBuilder x = new StringBuilder();
+        for(String each: prefixOrder){
+            Object cur = settings.get(each);
+            if(cur != null){
+                x.append(cur.toString());
+                x.append("|");
+                settings.remove(each);
+            }
+            else{
+                break;
+            }
+        }
+
+        if(x.length() == 0) {
+            return null;
+        }
+        else
+        {
+            x.deleteCharAt(x.length()-1);
+            return x.toString();
+        }
+    }
+
+    public void deserialize(String str)
+    {
+
+        String[] elements = str.split("\\|");
+        this.metricName = elements[1];
+        this.timestamp = Long.parseLong(elements[2]);
+        this.compId = elements[3];
+        this.topoId = elements[0];
+
     }
 }
