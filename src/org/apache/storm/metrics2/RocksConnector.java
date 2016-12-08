@@ -111,15 +111,23 @@ public class RocksConnector {
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            String[] elements = key.split("\\|");
 
-            if (!(
-                    settings.containsKey(StringKeywords.metricName) && !elements[0].equals(settings.get(StringKeywords.metricName)) ||
-                    settings.containsKey(StringKeywords.component) && !elements[0].equals(settings.get(StringKeywords.component)) ||
-                    settings.containsKey(StringKeywords.topoId) && !elements[3].equals(settings.get(StringKeywords.topoId))
-                )){
+            Metric possible_key = new Metric(key);
+
+            if(settings.containsKey("compId") && !possible_key.getCompId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("metric") && !possible_key.getMetricName().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() <= Long.parseLong(settings.get("timeStart").toString())) {
+                continue;
+            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() >= Long.parseLong(settings.get("timeEnd").toString())) {
+                continue;
+            } else {
                 result.add(String.format("%s", new String(iterator.value())));
             }
+
         }
         return result;
     }

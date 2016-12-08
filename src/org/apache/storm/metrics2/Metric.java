@@ -30,8 +30,8 @@ public class Metric {
     private String host;
     private int port;
     private String componentName;
-    private int compId;
-    private int timestamp;
+    private String compId;
+    private Long timestamp;
     private String value;
     private String dimensions;
     private static String[] prefixOrder = {StringKeywords.topoId, StringKeywords.metricName, StringKeywords.time,
@@ -43,7 +43,7 @@ public class Metric {
         return value;
     }
 
-    public Metric(String metric, int TS, int compId, String topoId, String value)
+    public Metric(String metric, Long TS, String compId, String topoId, String value)
     {
         this.metricName = metric;
         this.timestamp = TS;
@@ -56,6 +56,14 @@ public class Metric {
     {
         deserialize(str);
     }
+
+    public String getCompId() { return this.compId; }
+
+    public Long getTimeStamp() { return this.timestamp; }
+
+    public String getTopoId() { return this.topoId; }
+
+    public String getMetricName() { return this.metricName; }
 
     public String serialize()
     {
@@ -99,8 +107,8 @@ public class Metric {
     {
         String[] elements = str.split("\\|");
         this.metricName = elements[0];
-        this.timestamp = Integer.parseInt(elements[6]);
-        this.compId = Integer.parseInt(elements[5]);
+        this.timestamp = Long.parseLong(elements[6]);
+        this.compId = elements[5];
         this.topoId = elements[1];
         this.value = elements[7];
 
