@@ -105,9 +105,9 @@ public class RocksConnector {
                 continue;
             } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
                 continue;
-            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() < Long.parseLong(settings.get("timeStart").toString())) {
+            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() <= Long.parseLong(settings.get("timeStart").toString())) {
                 continue;
-            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() > Long.parseLong(settings.get("timeEnd").toString())) {
+            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() >= Long.parseLong(settings.get("timeEnd").toString())) {
                 continue;
             } else {
                 result.add(String.format("%s", new String(iterator.value())));
