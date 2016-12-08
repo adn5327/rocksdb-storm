@@ -34,6 +34,7 @@ public class MetricStoreConfig {
     /**
      * Configures metrics store to use the class specified in the conf map
      * @param conf Storm config map
+     * @return MetricStore prepared store
      */
     public MetricStore configure(Map conf) {
 
@@ -62,6 +63,7 @@ public class MetricStoreConfig {
     /**
      * Validates top level configurations of the metrics conf map
      * @param conf Storm config map
+     * @throws MetricException
      */
     private void validateConfig(Map conf) throws MetricException{
         if (!(conf.containsKey("storm.metrics2.store.connector_class"))) {
