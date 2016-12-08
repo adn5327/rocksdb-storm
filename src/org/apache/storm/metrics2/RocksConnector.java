@@ -117,7 +117,7 @@ public class RocksConnector {
         return result;
     }
 
-    public boolean checkMetric(Metric possibleKey, HashMap<String, Object> settings)
+    private boolean checkMetric(Metric possibleKey, HashMap<String, Object> settings)
     {
         if(settings.containsKey(StringKeywords.component) && !possibleKey.getCompId().equals(settings.get(StringKeywords.component))) {
             return false;
