@@ -60,13 +60,13 @@ public class RocksDBConnector implements MetricStore {
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
-        boolean createIfMissing = Boolean.parseBoolean(config.get("storm.metrics2.store.rocksdb_connector.create_if_missing").toString());
+        boolean createIfMissing = Boolean.parseBoolean(config.get("storm.metrics2.store.rocksdb.create_if_missing").toString());
         Options options = new Options().setCreateIfMissing(createIfMissing);
 
         this.db = null;
         try {
             // a factory method that returns a RocksDB instance
-            String path = config.get("storm.metrics2.store.rocksdb_connector.location").toString();
+            String path = config.get("storm.metrics2.store.rocksdb.location").toString();
             this.db = RocksDB.open(options, path);
             // do something
         } catch (RocksDBException e) {
@@ -149,27 +149,22 @@ public class RocksDBConnector implements MetricStore {
      * @throws MetricException if there is a missing required configuration or if the store does not exist but
      * the config specifies not to create the store
      */
-    @Override
-    public void validateConfig(Map config) throws MetricException {
-        if (!(config.containsKey("storm.metrics2.store.connector_class"))) {
-            throw new MetricException("Not a vaild metrics configuration - Missing store type");
-        }
-
-        if (config.get("storm.metrics2.store.connector_class") != "rocksdb_connector") {
+    private void validateConfig(Map config) throws MetricException {
+        if (config.get("storm.metrics2.store.connector_class") != "org.apache.storm.metrics2.RocksDBConnector") {
             throw new MetricException("Not a configuration for the RockDB Connector");
         }
 
-        if (!(config.containsKey("storm.metrics2.store.rocksdb_connector.location"))) {
+        if (!(config.containsKey("storm.metrics2.store.rocksdb.location"))) {
             throw new MetricException("Not a vaild RocksDB configuration - Missing store location");
         }
 
-        if (!(config.containsKey("storm.metrics2.store.rocksdb_connector.create_if_missing"))) {
+        if (!(config.containsKey("storm.metrics2.store.rocksdb.create_if_missing"))) {
             throw new MetricException("Not a vaild RocksDB configuration - Does not specify creation policy");
         }
 
-        String createIfMissing = config.get("storm.metrics2.store.rocksdb_connector.create_if_missing").toString();
+        String createIfMissing = config.get("storm.metrics2.store.rocksdb.create_if_missing").toString();
         if (!Boolean.parseBoolean(createIfMissing)) {
-            String storePath = config.get("storm.metrics2.store.rocksdb_connector.location").toString();
+            String storePath = config.get("storm.metrics2.store.rocksdb.location").toString();
             if (!(new File(storePath).exists())) {
                 throw new MetricException("Configuration specifies not to create a store but no store currently exists");
             }

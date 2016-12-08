@@ -65,14 +65,6 @@ public interface MetricStore {
      */
     List<String> scan(HashMap settings);
 
-    /**
-     * Validates storm configuration for Metrics Store
-     * @param config Storm config to specify which store type, location of store and creation policy
-     * @throws MetricException if there is a missing required configuration or if the store does not exist but
-     * the config specifies not to create the store
-     */
-    void validateConfig(Map config) throws MetricException;
-
     //void remove();
 
 }

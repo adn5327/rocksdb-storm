@@ -30,14 +30,14 @@ import java.util.HashMap;
 public class Main {
 
     public static void main(String[] args) throws MetricException{
-        MetricStore store = new RocksDBConnector();
 
         Map config = new HashMap();
-        config.put("storm.metrics2.store.connector_class", "rocksdb_connector");
-        config.put("storm.metrics2.store.rocksdb_connector.location", "db.test");
-        config.put("storm.metrics2.store.rocksdb_connector.create_if_missing", "true");
+        config.put("storm.metrics2.store.connector_class", "org.apache.storm.metrics2.RocksDBConnector");
+        config.put("storm.metrics2.store.rocksdb.location", "db.test");
+        config.put("storm.metrics2.store.rocksdb.create_if_missing", "false");
 
-        store.prepare(config);
+        MetricStoreConfig storeConf = new MetricStoreConfig();
+        MetricStore store = storeConf.configure(config);
 
         // File IO
         try (BufferedReader br = new BufferedReader(new FileReader("./logs/metrics_sample.txt"))) {
