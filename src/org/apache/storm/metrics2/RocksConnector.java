@@ -22,6 +22,7 @@ import java.lang.String;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.rocksdb.RocksDB;
 import org.rocksdb.Options;
@@ -95,16 +96,23 @@ public class RocksConnector {
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            String[] elements = key.split("\\|");
 
-            if (!(settings.containsKey("compId") && !elements[3].equals(settings.get("compId")) || // Iterate backwards through prefix key for efficiency
-                    settings.containsKey("timeStart") && !(Long.parseLong(elements[2]) >= Long.parseLong(settings.get("timeStart").toString())) ||
-                    settings.containsKey("timeEnd") && !(Long.parseLong(elements[2]) <= Long.parseLong(settings.get("timeEnd").toString())) ||
-                    settings.containsKey("metric") && !elements[1].equals(settings.get("metric")) ||
-                    settings.containsKey("topoId") && !elements[0].equals(settings.get("topoId"))
-                )){
+            Metric possible_key = new Metric(key);
+
+            if(settings.containsKey("compId") && !possible_key.getCompId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("metric") && !possible_key.getMetricName().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() < Long.parseLong(settings.get("timeStart").toString())) {
+                continue;
+            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() > Long.parseLong(settings.get("timeEnd").toString())) {
+                continue;
+            } else {
                 result.add(String.format("%s", new String(iterator.value())));
             }
+
         }
         return result;
     }
