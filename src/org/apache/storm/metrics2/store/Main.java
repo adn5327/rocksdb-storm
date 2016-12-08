@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.apache.storm.metrics2;
+package org.apache.storm.metrics2.store;
 
 import java.io.FileReader;
 import java.io.BufferedReader;
@@ -32,7 +32,7 @@ public class Main {
     public static void main(String[] args) throws MetricException{
 
         Map config = new HashMap();
-        config.put("storm.metrics2.store.connector_class", "org.apache.storm.metrics2.RocksDBConnector");
+        config.put("storm.metrics2.store.connector_class", "org.apache.storm.metrics2.store.RocksDBConnector");
         config.put("storm.metrics2.store.rocksdb.location", "db.test");
         config.put("storm.metrics2.store.rocksdb.create_if_missing", "false");
 

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.apache.storm.metrics2;
+package org.apache.storm.metrics2.store;
 
 
 public class MetricException extends Exception
