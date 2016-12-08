@@ -60,6 +60,7 @@ public class RocksDBConnector implements MetricStore {
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
         // that determines the behavior of a database.
+        //Utils.getString
         boolean createIfMissing = Boolean.parseBoolean(config.get("storm.metrics2.store.rocksdb.create_if_missing").toString());
         Options options = new Options().setCreateIfMissing(createIfMissing);
 
@@ -132,13 +133,23 @@ public class RocksDBConnector implements MetricStore {
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            String[] elements = key.split("\\|");
 
-            if (!(settings.containsKey("metric") && !elements[0].equals(settings.get("metric")) ||
-                    settings.containsKey("compId") && !elements[0].equals(settings.get("compId")) ||
-                    settings.containsKey("topoId") && !elements[3].equals(settings.get("topoId")))){
+            Metric possible_key = new Metric(key);
+
+            if(settings.containsKey("compId") && !possible_key.getCompId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("metric") && !possible_key.getMetricName().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
+                continue;
+            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() <= Long.parseLong(settings.get("timeStart").toString())) {
+                continue;
+            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() >= Long.parseLong(settings.get("timeEnd").toString())) {
+                continue;
+            } else {
                 result.add(String.format("%s", new String(iterator.value())));
             }
+
         }
         return result;
     }
