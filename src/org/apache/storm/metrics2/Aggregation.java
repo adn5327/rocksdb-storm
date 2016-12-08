@@ -56,6 +56,15 @@ public class Aggregation {
         this.settings.put("compId", comp);
     }
 
+    public void filterTimeStart(Long time) { this.settings.put("startTime", time);}
+
+    public void filterTimeEnd(Long time) { this.settings.put("endTime", time);}
+
+    public void filterTime(String startTime, String endTime) {
+        this.settings.put("startTime", startTime);
+        this.settings.put("endTime", endTime);
+    }
+
     // Aggregations
 
     public Double sum() throws MetricException {
