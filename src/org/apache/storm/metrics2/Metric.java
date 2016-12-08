@@ -52,6 +52,11 @@ public class Metric {
         this.value = value;
     }
 
+    public Metric(String str)
+    {
+        deserialize(str);
+    }
+
     public String serialize()
     {
         StringBuilder x = new StringBuilder();
