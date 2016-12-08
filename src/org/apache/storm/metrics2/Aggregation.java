@@ -27,33 +27,34 @@ public class Aggregation {
     private MetricStore store;
 
     // Key components
-    private HashMap settings = new HashMap();
+    private HashMap<String, Object> settings;
 
     public Aggregation(MetricStore store) {
         this.store = store;
+        settings = new HashMap<String, Object>();
     }
 
     // Filter for specific fields
     // Todo: Filter for different instances of the same field, two hosts for example
 
     public void filterMetric(String metric) {
-        this.settings.put("metric", metric);
+        this.settings.put(StringKeywords.metricName, metric);
     }
 
     public void filterTopo(String topoId) {
-        this.settings.put("topoId", topoId);
+        this.settings.put(StringKeywords.topoId, topoId);
     }
 
     public void filterHost(String host) {
-        this.settings.put("host", host);
+        this.settings.put(StringKeywords.host, host);
     }
 
     public void filterPort(String port) {
-        this.settings.put("port", port);
+        this.settings.put(StringKeywords.port, port);
     }
 
     public void filterComp(String comp) {
-        this.settings.put("compId", comp);
+        this.settings.put(StringKeywords.component, comp);
     }
 
     public void filterTimeStart(Long time) { this.settings.put("startTime", time);}
@@ -71,7 +72,7 @@ public class Aggregation {
         Double sum = 0.0;
         List<String> x = this.store.scan(settings);
         for(String each : x) {
-            System.out.println(each);
+            //System.out.println(each);
             sum += Double.parseDouble(each);
         }
         return sum;

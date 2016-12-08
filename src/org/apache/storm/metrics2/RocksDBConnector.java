@@ -105,51 +105,51 @@ public class RocksDBConnector implements MetricStore {
     }
 
     /**
-     * Implements scan method of the Metrics Store, scans all metrics with prefix in the store
-     * @param prefix prefix to query in store
+     * Implements scan method of the Metrics Store, scans all metrics with settings in the store
+     * Will try to search the fastest way possible
+     * @param settings map of settings to search by
      * @return List<String> metrics in store
      */
     @Override
-    public List<String> scan(String prefix) {
+    public List<String> scan(HashMap<String, Object> settings) {
         List<String> result = new ArrayList<String>();
+        //IF CAN CREATE PREFIX -- USE THAT
+        //ELSE DO FULL TABLE SCAN
+        String prefix = Metric.createPrefix(settings);
+        if (prefix != null) {
+            return scan(prefix, settings);
+        }
         RocksIterator iterator = this.db.newIterator();
-        for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
+        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            if (key.startsWith(prefix)) {
-                result.add(String.format("%s", new String(iterator.key())));
+
+            Metric possibleKey = new Metric(key);
+            if (checkMetric(possibleKey, settings)) {
+                result.add(String.format("%s", new String(iterator.value())));
             }
+
         }
         return result;
     }
 
     /**
-     * Implements scan method of the Metrics Store, scans all metrics with settings in the store
-     * @param settings map of settings to search by
+     * Implements scan method of the Metrics Store, scans all metrics with prefix in the store
+     * @param prefix prefix to query in store
+     * @param settings search settings
      * @return List<String> metrics in store
      */
-    @Override
-    public List<String> scan(HashMap settings) {
+    private List<String> scan(String prefix, HashMap<String, Object> settings) {
         List<String> result = new ArrayList<String>();
         RocksIterator iterator = this.db.newIterator();
-        for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
+        for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-
-            Metric possible_key = new Metric(key);
-
-            if(settings.containsKey("compId") && !possible_key.getCompId().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("metric") && !possible_key.getMetricName().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() <= Long.parseLong(settings.get("timeStart").toString())) {
-                continue;
-            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() >= Long.parseLong(settings.get("timeEnd").toString())) {
-                continue;
-            } else {
+            if (!key.startsWith(prefix)) {
+                break;
+            }
+            Metric possibleKey = new Metric(key);
+            if (checkMetric(possibleKey, settings)) {
                 result.add(String.format("%s", new String(iterator.value())));
             }
-
         }
         return result;
     }
@@ -183,7 +183,29 @@ public class RocksDBConnector implements MetricStore {
         return;
     }
 
-    private void remove() {
+    /**
+     * Implements configuration validation of Metrics Store, validates storm configuration for Metrics Store
+     * @param possibleKey key to check
+     * @param settings search settings
+     * @throws MetricException if there is a missing required configuration or if the store does not exist but
+     * the config specifies not to create the store
+     */
+    private boolean checkMetric(Metric possibleKey, HashMap<String, Object> settings)  {
+        if(settings.containsKey(StringKeywords.component) && !possibleKey.getCompId().equals(settings.get(StringKeywords.component))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.metricName) && !possibleKey.getMetricName().equals(settings.get(StringKeywords.metricName))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.topoId) && !possibleKey.getTopoId().equals(settings.get(StringKeywords.topoId))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.timeStart) && possibleKey.getTimeStamp() <= Long.parseLong(settings.get(StringKeywords.timeStart).toString())) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.timeEnd) && possibleKey.getTimeStamp() >= Long.parseLong(settings.get(StringKeywords.timeEnd).toString())) {
+            return false;
+        }
+        return true;
+    }
+
+    public void remove() {
 
     }
 

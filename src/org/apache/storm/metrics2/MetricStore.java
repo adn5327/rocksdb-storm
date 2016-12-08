@@ -52,18 +52,12 @@ public interface MetricStore {
     List<String> scan();
 
     /**
-     * Scans all metrics with prefix in the store
-     * @param prefix prefix to query in store
-     * @return List<String> metrics in store
-     */
-    List<String> scan(String prefix);
-
-    /**
-     * Scans all metrics with settings in the store
+     * Implements scan method of the Metrics Store, scans all metrics with settings in the store
+     * Will try to search the fastest way possible
      * @param settings map of settings to search by
      * @return List<String> metrics in store
      */
-    List<String> scan(HashMap settings);
+    List<String> scan(HashMap<String, Object> settings);
 
     //void remove();
 
