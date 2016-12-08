@@ -29,11 +29,12 @@ public class Metric {
     private String topoId;
     private String host;
     private int port;
-    private String componentName;
     private String compId;
     private Long timestamp;
     private String value;
+    private String executor;
     private String dimensions;
+    private String stream;
     private static String[] prefixOrder = {StringKeywords.topoId, StringKeywords.metricName, StringKeywords.time,
                                     StringKeywords.component, StringKeywords.executor, StringKeywords.host,
                                     StringKeywords.port, StringKeywords.port, StringKeywords.stream};
@@ -68,13 +69,21 @@ public class Metric {
     public String serialize()
     {
         StringBuilder x = new StringBuilder();
+        x.append(this.topoId);
+        x.append("|");
         x.append(this.metricName);
         x.append("|");
         x.append(this.timestamp);
         x.append("|");
         x.append(this.compId);
         x.append("|");
-        x.append(this.topoId);
+        x.append(this.executor);
+        x.append("|");
+        x.append(this.host);
+        x.append("|");
+        x.append(this.port);
+        x.append("|");
+        x.append(this.stream);
 
         return String.valueOf(x);
     }
@@ -105,12 +114,12 @@ public class Metric {
 
     public void deserialize(String str)
     {
+
         String[] elements = str.split("\\|");
-        this.metricName = elements[0];
-        this.timestamp = Long.parseLong(elements[6]);
-        this.compId = elements[5];
-        this.topoId = elements[1];
-        this.value = elements[7];
+        this.metricName = elements[1];
+        this.timestamp = Long.parseLong(elements[2]);
+        this.compId = elements[3];
+        this.topoId = elements[0];
 
     }
 }

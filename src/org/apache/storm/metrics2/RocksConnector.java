@@ -19,10 +19,7 @@ package org.apache.storm.metrics2;
 
 import java.lang.String;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.rocksdb.RocksDB;
 import org.rocksdb.Options;
@@ -84,14 +81,12 @@ public class RocksConnector {
         RocksIterator iterator = this.db.newIterator();
         for (iterator.seek(prefix.getBytes()); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
-            boolean add = true;
-            for(Map.Entry<String, Object> entry: settings.entrySet()){
-                if(!key.contains(entry.getValue().toString())){
-                    add = false;
-                    break;
-                }
+            if(!key.startsWith(prefix))
+            {
+                break;
             }
-            if(add == true)
+            Metric possibleKey = new Metric(key);
+            if(checkMetric(possibleKey, settings))
             {
                 result.add(String.format("%s", new String(iterator.value())));
             }
@@ -112,24 +107,30 @@ public class RocksConnector {
         for (iterator.seekToFirst(); iterator.isValid(); iterator.next()) {
             String key = new String(iterator.key());
 
-            Metric possible_key = new Metric(key);
-
-            if(settings.containsKey("compId") && !possible_key.getCompId().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("metric") && !possible_key.getMetricName().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("topoId") && !possible_key.getTopoId().equals(settings.get("compId"))) {
-                continue;
-            } else if(settings.containsKey("timeStart") && possible_key.getTimeStamp() <= Long.parseLong(settings.get("timeStart").toString())) {
-                continue;
-            } else if(settings.containsKey("timeEnd") && possible_key.getTimeStamp() >= Long.parseLong(settings.get("timeEnd").toString())) {
-                continue;
-            } else {
+            Metric possibleKey = new Metric(key);
+            if(checkMetric(possibleKey, settings))
+            {
                 result.add(String.format("%s", new String(iterator.value())));
             }
 
         }
         return result;
+    }
+
+    public boolean checkMetric(Metric possibleKey, HashMap<String, Object> settings)
+    {
+        if(settings.containsKey(StringKeywords.component) && !possibleKey.getCompId().equals(settings.get(StringKeywords.component))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.metricName) && !possibleKey.getMetricName().equals(settings.get(StringKeywords.metricName))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.topoId) && !possibleKey.getTopoId().equals(settings.get(StringKeywords.topoId))) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.timeStart) && possibleKey.getTimeStamp() <= Long.parseLong(settings.get(StringKeywords.timeStart).toString())) {
+            return false;
+        } else if(settings.containsKey(StringKeywords.timeEnd) && possibleKey.getTimeStamp() >= Long.parseLong(settings.get(StringKeywords.timeEnd).toString())) {
+            return false;
+        }
+        return true;
     }
 
 }
