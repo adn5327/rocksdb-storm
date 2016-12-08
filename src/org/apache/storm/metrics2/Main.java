@@ -23,17 +23,19 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.HashMap;
+
 
 public class Main {
 
     public static void main(String[] args) throws MetricException{
-        MetricStore store = new RocksConnector();
+        MetricStore store = new RocksDBConnector();
 
-        HashMap config = new HashMap();
-        config.put("store-type", "rocksdb");
-        config.put("store-location", "db.test");
-        config.put("create-if-missing", "true");
+        Map config = new HashMap();
+        config.put("storm.metrics2.store.connector_class", "rocksdb_connector");
+        config.put("storm.metrics2.store.rocksdb_connector.location", "db.test");
+        config.put("storm.metrics2.store.rocksdb_connector.create_if_missing", "true");
 
         store.prepare(config);
 

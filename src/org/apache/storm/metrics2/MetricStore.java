@@ -18,6 +18,7 @@
 
 package org.apache.storm.metrics2;
 
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public interface MetricStore {
      * using the configurations provided via the config map
      * @param config Storm config map
      */
-    void prepare(HashMap config);
+    void prepare(Map config);
 
     /**
      * Stores metrics in the store
@@ -70,7 +71,7 @@ public interface MetricStore {
      * @throws MetricException if there is a missing required configuration or if the store does not exist but
      * the config specifies not to create the store
      */
-    void validateConfig(HashMap config) throws MetricException;
+    void validateConfig(Map config) throws MetricException;
 
     //void remove();
 
