@@ -56,9 +56,9 @@ public class Aggregation {
         this.settings.put("compId", comp);
     }
 
-    public void filterTimeStart(String time) { this.settings.put("startTime", time);}
+    public void filterTimeStart(Long time) { this.settings.put("startTime", time);}
 
-    public void filterTimeEnd(String time) { this.settings.put("endTime", time);}
+    public void filterTimeEnd(Long time) { this.settings.put("endTime", time);}
 
     public void filterTime(String startTime, String endTime) {
         this.settings.put("startTime", startTime);
