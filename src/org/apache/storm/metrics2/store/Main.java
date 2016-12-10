@@ -49,7 +49,7 @@ public class Main {
                 String[] elements = line.split("\\s+");
                 //    public Metric(String metric, int TS, int compId, String topoId, String value)
                 //metric	topoId	host	port	compname	compId	TS	value	dimentions (key=value)
-                store.insert(new Metric(elements[0], Long.parseLong(elements[6]), elements[5], elements[1], elements[7]));
+                store.insert(new Metric(elements[0], Long.parseLong(elements[6]), null, elements[5], elements[1], elements[7]));
             }
         } catch (FileNotFoundException e) {
             System.out.println(e);

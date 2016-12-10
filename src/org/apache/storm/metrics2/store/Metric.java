@@ -44,7 +44,7 @@ public class Metric {
         return value;
     }
 
-    public Metric(String metric, Long TS, String compId, String topoId, String value)
+    public Metric(String metric, Long TS, String executor, String compId, String topoId, String value)
     {
         this.metricName = metric;
         this.timestamp = TS;
